@@ -24,7 +24,7 @@ WORKDIR /
 
 COPY --from=build /docker-gs-ping-roach /docker-gs-ping-roach
 
-EXPOSE 8080
+EXPOSE 80
 
 USER nonroot:nonroot
 
