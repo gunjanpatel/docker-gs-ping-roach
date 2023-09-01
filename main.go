@@ -49,6 +49,7 @@ func main() {
 
 type Message struct {
 	Value string `json:"value"`
+	Url   string `json:"url"`
 }
 
 func initStore() (*sql.DB, error) {
@@ -76,7 +77,7 @@ func initStore() (*sql.DB, error) {
 	}
 
 	if _, err := db.Exec(
-		"CREATE TABLE IF NOT EXISTS message (value STRING PRIMARY KEY)"); err != nil {
+		"CREATE TABLE IF NOT EXISTS message (value STRING PRIMARY KEY, url STRING)"); err != nil {
 		return nil, err
 	}
 
@@ -102,8 +103,9 @@ func sendHandler(db *sql.DB, c echo.Context) error {
 	err := crdb.ExecuteTx(context.Background(), db, nil,
 		func(tx *sql.Tx) error {
 			_, err := tx.Exec(
-				"INSERT INTO message (value) VALUES ($1) ON CONFLICT (value) DO UPDATE SET value = excluded.value",
+				"INSERT INTO message (value, url) VALUES ($1, $2) ON CONFLICT (value) DO UPDATE SET value = excluded.value",
 				m.Value,
+				m.Url,
 			)
 			if err != nil {
 				return c.JSON(http.StatusInternalServerError, err)

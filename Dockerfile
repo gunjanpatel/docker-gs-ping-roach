@@ -2,17 +2,16 @@
 ## Build
 ##
 
-FROM golang:1.16-buster AS build
+FROM golang:1.21-bookworm AS build
 
 WORKDIR /app
 
-COPY go.mod .
-COPY go.sum .
+COPY go.mod go.sum ./
 RUN go mod download
 
 COPY *.go ./
 
-RUN go build -o /docker-gs-ping-roach
+RUN CGO_ENABLED=0 GOOS=linux go build -o /docker-gs-ping-roach
 
 ##
 ## Deploy
